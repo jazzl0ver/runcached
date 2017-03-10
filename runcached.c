@@ -139,7 +139,7 @@ int isfile(char *path) {
 
 void cleanup(void) {
     //if ( access( pidfile, F_OK ) != -1 ) {
-	printf("Cleanup\n");
+//	printf("Cleanup\n");
     if (isfile(pidfile)) {
         unlink(pidfile);
     }
@@ -157,14 +157,17 @@ int runit(char **argv,char * cmd,char * cmddatafile,char * cmdexitcode,char * cm
     fflush(stdout);
     fflush(stderr);
 
+    // restrict access to the files
+    umask(026);
+
     //redirect stdout and stderr to file
     out_old = dup(1);
-    out_new = open(cmddatafile,O_WRONLY|O_CREAT|O_TRUNC,S_IROTH|S_IRUSR|S_IRGRP|S_IWUSR);
+    out_new = open(cmddatafile,O_WRONLY|O_CREAT|O_TRUNC,S_IRUSR|S_IRGRP|S_IWUSR);
     dup2(out_new, 1);
     close(out_new);
 
     err_old = dup(2);
-    err_new = open(cmddatafile,O_WRONLY|O_CREAT|O_APPEND,S_IROTH|S_IRUSR|S_IRGRP|S_IWUSR);
+    err_new = open(cmddatafile,O_WRONLY|O_CREAT|O_APPEND,S_IRUSR|S_IRGRP|S_IWUSR);
     dup2(err_new, 2);
     close(err_new);
 
